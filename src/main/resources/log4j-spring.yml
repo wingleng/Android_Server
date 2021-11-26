@@ -1,0 +1,24 @@
+Configration:
+
+
+  Properties: # 定义全局变量
+    Property: # 缺省配置（用于开发环境）。其他环境需要在VM参数中指定，如下：
+      - name: log.pattern
+        value: "%d{yyyy-MM-dd HH:mm:ss.SSS} -%5p ${PID:-} [%15.15t] %-30.30C{1.} : %m%n"
+
+
+    Appenders:
+      Console: #输出到控制台
+        name: CONSOLE
+        target: SYSTEM_OUT
+        PatternLayout:
+          pattern: ${log.pattern}
+
+
+    Loggers:
+      Root:
+        level: info
+        AppenderRef:
+          - ref: CONSOLE
+          - ref: ROLLING_FILE
+          - ref: EXCEPTION_ROLLING_FILE
