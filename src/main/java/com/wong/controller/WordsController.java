@@ -34,4 +34,12 @@ public class WordsController {
         Log.i("/randWord/{"+number+"},返回的随机单词数："+list.size());
         return result;
     }
+
+    @GetMapping("/test")
+    public String test(){
+        Log.i("测试接口");
+        List<Word> list=queryMapper.randomWords(10,Word.class);
+        String result = JSON.toJSONString(list);
+        return result;
+    }
 }

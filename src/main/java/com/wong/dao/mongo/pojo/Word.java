@@ -20,6 +20,9 @@ public class Word implements Serializable {
     @Id
     private String _id;
 
+    @Field("voices")
+    private List<String> voices;
+
     @Field("names")
     private String names;
 
