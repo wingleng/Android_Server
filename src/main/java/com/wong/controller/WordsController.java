@@ -34,6 +34,9 @@ public class WordsController {
         List<Word> list=queryMapper.randomWords(number,Word.class);
         String result = JSON.toJSONString(list);
         Log.i("/randWord/{"+number+"},返回的随机单词数："+list.size());
+
+        //数据有问题，打印数据看看
+        Log.i(result);
         return result;
     }
 

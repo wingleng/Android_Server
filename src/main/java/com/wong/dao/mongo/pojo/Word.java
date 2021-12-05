@@ -26,6 +26,9 @@ public class Word implements Serializable {
     @Field("names")
     private String names;
 
+    @Field("means")
+    private List<String> means;
+
     @Field("derive")
     private List<String> derive;
 
