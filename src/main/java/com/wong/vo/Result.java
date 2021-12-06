@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * 原本想使用这个类，将返回接口统一的，但是json转换不熟练，所以还是算了吧。
+ * 使用这个类统一返回接口.可惜安卓端没有使用这个类。。。。
  */
 @Data
 @AllArgsConstructor
