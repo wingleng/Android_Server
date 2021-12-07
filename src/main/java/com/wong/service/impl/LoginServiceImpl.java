@@ -42,7 +42,7 @@ public class LoginServiceImpl implements LoginService {
             return Result.fail(ErrorCode.PARAMS_ERROR.getCode(), ErrorCode.PARAMS_ERROR.getMsg());
         }
 
-        //前往数据库中进行查询
+        //前往数据库中进行查询，验证用户名和密码名是否正确
         password = DigestUtils.md5Hex(password + SomeProperties.salt);
         User user = userService.findUser(username,password);
 
@@ -52,7 +52,7 @@ public class LoginServiceImpl implements LoginService {
         }
 
         //创建token，并且放进redis中？
-        //TODO:这里可能会出现问题。
+        //TODO:这里可能会出现问题，TOKEN和redis使用不熟练
         String token = JWTUtils.createToken(Long.valueOf(user.getUserId()));
         redisTemplate.opsForValue().set("TOKEN_"+token, JSON.toJSONString(user),1, TimeUnit.DAYS);
 
