@@ -21,4 +21,6 @@ public interface UserService {
      * 查询用户名是否有重复的
      */
     boolean isRepeatedUserName(String username);
+
+    Result getUserInfoByToken(String token);
 }

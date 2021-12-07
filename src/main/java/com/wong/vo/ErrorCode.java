@@ -8,7 +8,8 @@ public enum ErrorCode {
     ACCOUNT_EXITS(10004,"账户已经注册"),
     NO_PERMISSION(70001,"无访问权限"),
     SESSION_TIME_OUT(90001,"会话超时"),
-    NO_LOGIN(90002,"未登录"),;
+    NO_LOGIN(90002,"未登录"),
+    NULL_PARAM(10004,"参数为空！");
 
     private int code;
     private String msg;

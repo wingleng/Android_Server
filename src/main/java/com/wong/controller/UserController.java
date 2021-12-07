@@ -42,4 +42,17 @@ public class UserController {
     public Result Userlogin(@RequestBody LoginParam loginParam){
         return loginService.login(loginParam.getUsername(),loginParam.getPassword());
     }
+
+
+    /**
+     * 再添加一个接口，用户登录成功之后，可以直接通过token获取当前用户信息，不用再登录
+     */
+
+
+    @GetMapping("currentUser")
+    public Result currentUser(@RequestHeader("Authorization") String token){
+
+        return userService.getUserInfoByToken(token);
+    }
+
 }

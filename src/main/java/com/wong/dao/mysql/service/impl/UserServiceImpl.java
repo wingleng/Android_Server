@@ -1,16 +1,25 @@
 package com.wong.dao.mysql.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.wong.dao.mysql.mapper.UserMapper;
 import com.wong.dao.mysql.pojo.entity.User;
 import com.wong.dao.mysql.service.UserService;
+import com.wong.utils.JWTUtils;
 import com.wong.utils.Log;
 import com.wong.utils.SomeProperties;
 import com.wong.vo.ErrorCode;
 import com.wong.vo.Result;
+import com.wong.vo.UserVo;
+import io.netty.util.internal.StringUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -19,6 +28,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserMapper userMapper;
 
+    @Autowired
+    RedisTemplate<String,String> redisTemplate;
     /**
      * 先查询有没有重复的，再插入啊！
      * @param userName
@@ -29,6 +40,12 @@ public class UserServiceImpl implements UserService {
     public Result AddNewUser(String userName, String userPassword) {
         Log.i(userName);
         Log.i(userPassword);
+        //先判断空
+        if(StringUtils.isBlank(userName) || StringUtils.isBlank(userPassword)){
+            Log.i("用户名或密码为空");
+            return Result.fail(ErrorCode.NULL_PARAM.getCode(), ErrorCode.NULL_PARAM.getMsg());
+        }
+
         //先查重
         if (isRepeatedUserName(userName)){
             Log.i("用户名重复！！！");
@@ -39,6 +56,7 @@ public class UserServiceImpl implements UserService {
         user.setUserName(userName);
         user.setUserPassword(DigestUtils.md5Hex(userPassword + SomeProperties.salt));
         int result = userMapper.insert(user);
+        Log.i("成功插入一条数据");
         return Result.success("已成功插入1条数据");
     }
 
@@ -68,5 +86,28 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.selectOne(queryWrapper);
         Log.i("查重"+user);
         return user==null?false:true;
+    }
+
+    /**
+     * 直接通过token获取当前用户信息。
+     * @param token
+     * @return
+     */
+    @Override
+    public Result getUserInfoByToken(String token) {
+        Map<String,Object> map = JWTUtils.checkToken(token);
+        if(map == null){
+            return Result.fail(ErrorCode.NO_LOGIN.getCode(), ErrorCode.NO_LOGIN.getMsg());
+        }
+        String userJson = redisTemplate.opsForValue().get("TOKEN_" + token);
+        if(StringUtils.isBlank(userJson)){
+            return Result.fail(ErrorCode.NO_LOGIN.getCode(), ErrorCode.NO_LOGIN.getMsg());
+        }
+        User user = JSON.parseObject(userJson,User.class);
+        UserVo userVo = new UserVo();
+        userVo.setUserId(user.getUserId());
+        userVo.setUserName(user.getUserName());
+
+        return Result.success(userVo);
     }
 }
