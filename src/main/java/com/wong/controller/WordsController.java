@@ -6,6 +6,7 @@ import com.wong.dao.mongo.pojo.Word;
 import com.wong.dao.mongo.service.QueryMapperImpl;
 import com.wong.dao.mysql.service.UserService;
 import com.wong.utils.Log;
+import com.wong.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,14 +31,10 @@ public class WordsController {
      * @return
      */
     @GetMapping("/randWord/{num}")
-    public String randWord(@PathVariable("num") int number){
+    public Result randWord(@PathVariable("num") int number){
         List<Word> list=queryMapper.randomWords(number,Word.class);
-        String result = JSON.toJSONString(list);
         Log.i("/randWord/{"+number+"},返回的随机单词数："+list.size());
-
-        //数据有问题，打印数据看看
-        Log.i(result);
-        return result;
+        return Result.success(list);
     }
 
     /**

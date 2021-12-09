@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class QueryMapperImpl implements QueryMapper {
     public List<Word> randomWords(int numbers,Class<Word> cls) {
             Aggregation aggregation = Aggregation.newAggregation(
 //                            Aggregation.match(Criteria.where("status").is(1)),
+                            Aggregation.match(Criteria.where("examples.0").exists(true)),//加了一个无聊的筛选器，必须有网络图片的单词才会被选出来。。
                             Aggregation.sample(numbers));
             AggregationResults<Word> outputTypeCount = mongoTemplate.aggregate(aggregation, cls, cls);
             return outputTypeCount.getMappedResults();
