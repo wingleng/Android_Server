@@ -16,4 +16,6 @@ public class Exam_Object {
     private String audio;
 
     private String sentence;
+
+    private String title;
 }
