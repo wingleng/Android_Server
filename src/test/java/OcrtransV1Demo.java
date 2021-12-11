@@ -23,17 +23,17 @@ public class OcrtransV1Demo {
 
     private static final String YOUDAO_URL = "https://openapi.youdao.com/ocrtransapi";
 
-    private static final String APP_KEY = "您的应用ID";
+    private static final String APP_KEY = "5b9c6473842434f1";
 
-    private static final String APP_SECRET = "您的应用密钥";
+    private static final String APP_SECRET = "DePFvNrafw6FKqFzYKYJsXrF9fOXmLXl";
 
     public static void main(String[] args) throws IOException {
 
         Map<String,String> params = new HashMap<String,String>();
-        String q = loadAsBase64("图片的路径");
+        String q = loadAsBase64("D:\\Program Files\\DevelopPlaces\\Java_Demo\\SSM_Project\\Server_For_Android\\src\\test\\java\\docker.png");
         String salt = String.valueOf(System.currentTimeMillis());
-        String from = "源语言";
-        String to = "目标语言";
+        String from = "en";
+        String to = "zh-CHS";
         String type = "1";
         params.put("from",from);
         params.put("to",to);
