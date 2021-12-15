@@ -27,4 +27,11 @@ public class InsertController {
         Log.i("InsertController：向rememberWords进行插入操作。");
         return wordService.insertRemember(token,words);
     }
+
+
+   @PostMapping("/forget")
+    public Result insertforget(@RequestHeader("Authorization")String token,@RequestBody List<String> words){
+        Log.i("InsertController:向forgetWotds进行插入操作。");
+        return wordService.insertForget(token,words);
+   }
 }
