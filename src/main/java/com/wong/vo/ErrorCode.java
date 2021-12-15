@@ -9,7 +9,9 @@ public enum ErrorCode {
     NO_PERMISSION(70001,"无访问权限"),
     SESSION_TIME_OUT(90001,"会话超时"),
     NO_LOGIN(90002,"未登录"),
-    NULL_PARAM(10004,"参数为空！");
+    NULL_PARAM(10004,"参数为空！"),
+
+    INSERT_ERROR(30001,"数据插入失败");
 
     private int code;
     private String msg;

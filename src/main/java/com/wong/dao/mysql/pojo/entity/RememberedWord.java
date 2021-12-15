@@ -1,6 +1,8 @@
 package com.wong.dao.mysql.pojo.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -12,6 +14,8 @@ import java.io.Serializable;
  */
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RememberedWord implements Serializable {
     private static final long serialVersionUID = 593979484296095708L;
     

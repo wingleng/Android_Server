@@ -1,3 +1,5 @@
+package testjavas;
+
 import com.wong.dao.mongo.pojo.Word;
 import com.wong.dao.mongo.service.QueryMapperImpl;
 import com.wong.dao.mysql.service.UserService;

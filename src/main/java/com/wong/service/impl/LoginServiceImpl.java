@@ -5,6 +5,7 @@ import com.wong.dao.mysql.pojo.entity.User;
 import com.wong.dao.mysql.service.UserService;
 import com.wong.service.LoginService;
 import com.wong.utils.JWTUtils;
+import com.wong.utils.Log;
 import com.wong.utils.SomeProperties;
 import com.wong.vo.ErrorCode;
 import com.wong.vo.Result;
@@ -41,6 +42,7 @@ public class LoginServiceImpl implements LoginService {
 
         //判空
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
+            Log.i("用户名或账户为空");
             return Result.fail(ErrorCode.PARAMS_ERROR.getCode(), ErrorCode.PARAMS_ERROR.getMsg());
         }
 
@@ -50,6 +52,7 @@ public class LoginServiceImpl implements LoginService {
 
         //查询结果判断
         if(user == null){
+            Log.i("用户验证失败");
             return Result.fail(ErrorCode.ACCOUNT_PWD_NOT_EXIST.getCode(), ErrorCode.ACCOUNT_PWD_NOT_EXIST.getMsg());
         }
 

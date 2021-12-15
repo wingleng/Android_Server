@@ -1,3 +1,5 @@
+package testjavas;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -17,11 +19,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-public class OcrtransV1Demo {
 
-    private static Logger logger = LoggerFactory.getLogger(OcrtransV1Demo.class);
+public class FanyiV3Demo {
 
-    private static final String YOUDAO_URL = "https://openapi.youdao.com/ocrtransapi";
+    private static Logger logger = LoggerFactory.getLogger(FanyiV3Demo.class);
+
+    private static final String YOUDAO_URL = "https://openapi.youdao.com/api";
 
     private static final String APP_KEY = "5b9c6473842434f1";
 
@@ -30,27 +33,25 @@ public class OcrtransV1Demo {
     public static void main(String[] args) throws IOException {
 
         Map<String,String> params = new HashMap<String,String>();
-        String q = loadAsBase64("D:\\Program Files\\DevelopPlaces\\Java_Demo\\SSM_Project\\Server_For_Android\\src\\test\\java\\docker.png");
+        String q = "hello";
         String salt = String.valueOf(System.currentTimeMillis());
-        String from = "en";
-        String to = "zh-CHS";
-        String type = "1";
-        params.put("from",from);
-        params.put("to",to);
-        params.put("type",type);
-        params.put("q", q);
-        String signStr = APP_KEY + q + salt + APP_SECRET;
+        params.put("from", "en");
+        params.put("to", "zh-CHS");
+        params.put("signType", "v3");
+        String curtime = String.valueOf(System.currentTimeMillis() / 1000);
+        params.put("curtime", curtime);
+        String signStr = APP_KEY + truncate(q) + salt + curtime + APP_SECRET;
         String sign = getDigest(signStr);
         params.put("appKey", APP_KEY);
+        params.put("q", q);
         params.put("salt", salt);
         params.put("sign", sign);
-        String result = requestForHttp(YOUDAO_URL,params);
+//        params.put("vocabId","您的用户词表ID");
         /** 处理结果 */
-        System.out.println(result);
+        requestForHttp(YOUDAO_URL,params);
     }
 
-    public static String requestForHttp(String url,Map<String,String> params) throws IOException {
-        String result = "";
+    public static void requestForHttp(String url,Map<String,String> params) throws IOException {
 
         /** 创建HttpClient */
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -66,11 +67,32 @@ public class OcrtransV1Demo {
             paramsList.add(new BasicNameValuePair(key,value));
         }
         httpPost.setEntity(new UrlEncodedFormEntity(paramsList,"UTF-8"));
+
+
+        //发送？？
         CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
         try{
-            HttpEntity httpEntity = httpResponse.getEntity();
-            result = EntityUtils.toString(httpEntity,"UTF-8");
-            EntityUtils.consume(httpEntity);
+            Header[] contentType = httpResponse.getHeaders("Content-Type");
+            logger.info("Content-Type:" + contentType[0].getValue());
+            if("audio/mp3".equals(contentType[0].getValue())){
+                //如果响应是wav
+                HttpEntity httpEntity = httpResponse.getEntity();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                httpResponse.getEntity().writeTo(baos);
+                byte[] result = baos.toByteArray();
+                EntityUtils.consume(httpEntity);
+                if(result != null){//合成成功
+                    String file = "合成的音频存储路径"+System.currentTimeMillis() + ".mp3";
+                    byte2File(result,file);
+                }
+            }else{
+                /** 响应不是音频流，直接显示结果 */
+                HttpEntity httpEntity = httpResponse.getEntity();
+                String json = EntityUtils.toString(httpEntity,"UTF-8");
+                EntityUtils.consume(httpEntity);
+                logger.info(json);
+                System.out.println(json);
+            }
         }finally {
             try{
                 if(httpResponse!=null){
@@ -80,7 +102,6 @@ public class OcrtransV1Demo {
                 logger.info("## release resouce error ##" + e);
             }
         }
-        return result;
     }
 
     /**
@@ -93,7 +114,7 @@ public class OcrtransV1Demo {
         char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
         byte[] btInput = string.getBytes(StandardCharsets.UTF_8);
         try {
-            MessageDigest mdInst = MessageDigest.getInstance("MD5");
+            MessageDigest mdInst = MessageDigest.getInstance("SHA-256");
             mdInst.update(btInput);
             byte[] md = mdInst.digest();
             int j = md.length;
@@ -109,30 +130,30 @@ public class OcrtransV1Demo {
         }
     }
 
-    public static String loadAsBase64(String imgFile)
-    {//将图片文件转化为字节数组字符串，并对其进行Base64编码处理
+    /**
+     *
+     * @param result 音频字节流
+     * @param file 存储路径
+     */
+    private static void byte2File(byte[] result, String file) {
+        File audioFile = new File(file);
+        FileOutputStream fos = null;
+        try{
+            fos = new FileOutputStream(audioFile);
+            fos.write(result);
 
-        File file = new File(imgFile);
-        if(!file.exists()){
-            logger.error("文件不存在");
-            return null;
+        }catch (Exception e){
+            logger.info(e.toString());
+        }finally {
+            if(fos != null){
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        InputStream in = null;
-        byte[] data = null;
-        //读取图片字节数组
-        try
-        {
-            in = new FileInputStream(imgFile);
-            data = new byte[in.available()];
-            in.read(data);
-            in.close();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        //对字节数组Base64编码
-        return Base64.getEncoder().encodeToString(data);//返回Base64编码过的字节数组字符串
+
     }
 
     public static String truncate(String q) {
